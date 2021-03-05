@@ -13,8 +13,6 @@ import (
 	"time"
 )
 
-var asPem = flag.Bool("pem", false, "Print cert(s) in PEM format (default is to print cert details)")
-
 func main() {
 	flag.Parse()
 
