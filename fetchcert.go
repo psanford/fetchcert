@@ -13,6 +13,8 @@ import (
 	"time"
 )
 
+var sniName = flag.String("sni", "", "Use SNI in request")
+
 func main() {
 	flag.Parse()
 
@@ -33,6 +35,7 @@ func main() {
 
 	conf := tls.Config{
 		InsecureSkipVerify: true,
+		ServerName:         *sniName,
 	}
 	conf.VerifyPeerCertificate = func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
 		for _, cert := range rawCerts {
