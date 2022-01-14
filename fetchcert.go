@@ -6,6 +6,7 @@ import (
 	"encoding/pem"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/url"
 	"os"
@@ -14,6 +15,7 @@ import (
 )
 
 var sniName = flag.String("sni", "", "Use SNI in request")
+var rootCA = flag.String("ca", "", "Path to root CA file to use (default to system CAs")
 
 func main() {
 	flag.Parse()
@@ -37,6 +39,29 @@ func main() {
 		InsecureSkipVerify: true,
 		ServerName:         *sniName,
 	}
+
+	if *rootCA != "" {
+		certData, err := ioutil.ReadFile(*rootCA)
+		if err != nil {
+			log.Fatalf("Failed to open ca file: %s", err)
+		}
+
+		conf.RootCAs = x509.NewCertPool()
+
+		for {
+			b, rest := pem.Decode(certData)
+			if b == nil {
+				break
+			}
+			certData = rest
+			c, err := x509.ParseCertificate(b.Bytes)
+			if err != nil {
+				log.Fatalf("parse ca cert err: %s", err)
+			}
+			conf.RootCAs.AddCert(c)
+		}
+	}
+
 	conf.VerifyPeerCertificate = func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
 		for _, cert := range rawCerts {
 			pem.Encode(os.Stdout, &pem.Block{Type: "CERTIFICATE", Bytes: cert})
