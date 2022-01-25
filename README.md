@@ -11,6 +11,7 @@ You can also specify a server name with the `-sni` flag.
 
 Fetch a cert for a domain name:
 ```
+$ ./fetchcert google.com
 Dail google.com:443
 -----BEGIN CERTIFICATE-----
 MIINsTCCDJmgAwIBAgIRALThYcbfDJL1CgAAAAErfHwwDQYJKoZIhvcNAQELBQAw
