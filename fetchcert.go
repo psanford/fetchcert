@@ -6,7 +6,6 @@ import (
 	"encoding/pem"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/url"
 	"os"
@@ -19,6 +18,15 @@ var rootCA = flag.String("ca", "", "Path to root CA file to use (default to syst
 
 func main() {
 	flag.Parse()
+
+	godebug := os.Getenv("GODEBUG")
+	if !strings.Contains(godebug, "tlsrsakex") {
+		if len(godebug) > 0 {
+			godebug = godebug + ","
+		}
+		godebug = godebug + "tlsrsakex=1"
+		os.Setenv("GODEBUG", godebug)
+	}
 
 	args := flag.Args()
 	if len(args) < 1 {
@@ -41,7 +49,7 @@ func main() {
 	}
 
 	if *rootCA != "" {
-		certData, err := ioutil.ReadFile(*rootCA)
+		certData, err := os.ReadFile(*rootCA)
 		if err != nil {
 			log.Fatalf("Failed to open ca file: %s", err)
 		}
