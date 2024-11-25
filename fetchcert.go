@@ -15,17 +15,20 @@ import (
 
 var sniName = flag.String("sni", "", "Use SNI in request")
 var rootCA = flag.String("ca", "", "Path to root CA file to use (default to system CAs")
+var rsaKex = flag.Bool("rsakex", true, "Allow rsa key exchange")
 
 func main() {
 	flag.Parse()
 
-	godebug := os.Getenv("GODEBUG")
-	if !strings.Contains(godebug, "tlsrsakex") {
-		if len(godebug) > 0 {
-			godebug = godebug + ","
+	if *rsaKex {
+		godebug := os.Getenv("GODEBUG")
+		if !strings.Contains(godebug, "tlsrsakex") {
+			if len(godebug) > 0 {
+				godebug = godebug + ","
+			}
+			godebug = godebug + "tlsrsakex=1"
+			os.Setenv("GODEBUG", godebug)
 		}
-		godebug = godebug + "tlsrsakex=1"
-		os.Setenv("GODEBUG", godebug)
 	}
 
 	args := flag.Args()
